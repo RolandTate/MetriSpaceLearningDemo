@@ -21,6 +21,7 @@ class MVPTInternalNode:
         self.lowerBound = lowerBound  # 每棵子树到每个支撑点的距离下界
         self.upperBound = upperBound  # 每棵子树到每个支撑点的距离上界
 
+# MVP 树批建算法
 def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
     """
     MVP 树批建算法
@@ -35,10 +36,10 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
         return None
     # 当数据量小于等于 MaxLeafSize 时，构建 Pivot Table 作为叶子节点
     if len(data) < k or len(data) <= MaxLeafSize:
+        # 随机选择支撑点
         pivot = pivotSelection(data, 1)
         # 手动移除支撑点 VP
         data = [x for x in data if x != pivot]
-        print('create pivot table')
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择支撑点
@@ -52,8 +53,9 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
     for i in range(k):
         newPartitions = []
         for par in partitions:
-            # 每个现子集基于当前支撑点划分成f个新子集
-            newPartitions += split(par, VP[i], num_regions, distance_function)
+            if len(par) > 0:
+                # 每个现子集基于当前支撑点划分成f个新子集
+                newPartitions.extend(split(par, VP[i], num_regions, distance_function))
         partitions = newPartitions
 
     # 初始化上下界矩阵和子节点集合
@@ -64,18 +66,10 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
     # 计算每个子集的上下界并递归构建子节点
     for i, par in enumerate(partitions):
         for j in range(k):
-            # d = [distance_function(VP[j], p) for p in par]
-            # lower[j][i] = min(d)  # 计算下界
-            # upper[j][i] = max(d)  # 计算上界
-            if par:
-                print(f"{j, i} not empty")
+            if len(par) > 0:
                 d = [distance_function(VP[j], p) for p in par]
                 lower[j][i] = min(d)  # 计算下界
                 upper[j][i] = max(d)  # 计算上界
-            else:
-                print(f"{j, i} is empty")
-                lower[j][i] = float("inf")  # 计算下界
-                upper[j][i] = float("-inf")  # 计算上界
         children.append(MVPTBulkload(par, MaxLeafSize, k, num_regions, distance_function))
 
     # 递归构建左子树和右子树，并返回内部节点
@@ -164,9 +158,8 @@ if __name__ == "__main__":
     print(f'len(MVPT.children): {len(mvpt_root.children)} == num_regions {num_regions} ^ pivots_num {pivots_num}')
     for i, child in enumerate(mvpt_root.children):
         for j, pivot in enumerate(mvpt_root.pivots):
-
-            print(
-                    f'pivot {j + 1} children {i + 1} is empty lowerBound: {mvpt_root.lowerBound[j][i]}, upperBound: {mvpt_root.upperBound[j][i]}')
+            print(f'pivot {j + 1} children {i + 1} lowerBound: {mvpt_root.lowerBound[j][i]}, '
+                  f'upperBound: {mvpt_root.upperBound[j][i]}')
 
     # 使用范围查询算法
     result = MVPTRangeSearch(mvpt_root, query_point, search_radius, minkowski_distance)

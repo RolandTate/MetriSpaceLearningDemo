@@ -2,6 +2,7 @@ import random
 import os
 import json
 
+
 # 数据生成函数
 def generate_data(num_points, dimensions, lower=0, upper=100, save_to_file=False, file_name="data.json",
                   file_path="./"):
@@ -82,15 +83,23 @@ def determineSplitRadius(data, pivot, distanc_function):
 def getAllData(node):
     from Pivot_Table import PivotTable
     from VantagePointTree import VPTInternalNode
+    from MultipleVantagePointTree import MVPTInternalNode
 
     if isinstance(node, PivotTable):
         return node.data  # 叶子节点返回所有数据点
 
     result = []
+
+    # 如果是 VP 树
     if isinstance(node, VPTInternalNode):
         result.append(node.pivot)  # 添加支撑点
         result.extend(getAllData(node.left))  # 获取左子树数据
         result.extend(getAllData(node.right))  # 获取右子树数据
+
+    # 如果是 MVP 树
+    if isinstance(node, MVPTInternalNode):
+        result.extend(node.pivots)  # 添加支撑点
+        result.extend(getAllData(node.children))  # 获取所有分区
 
     return result
 

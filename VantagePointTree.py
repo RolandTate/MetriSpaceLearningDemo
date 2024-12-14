@@ -1,7 +1,7 @@
 from tools import generate_data, minkowski_distance_factory, pivotSelection, determineSplitRadius, getAllData
 from Pivot_Table import PivotTable, PTRangeSearch
 
-# VPT 树内部节点类
+# VP 树内部节点类
 class VPTInternalNode:
     def __init__(self, pivot, splitRadius, left, right):
         self.pivot = pivot  # 支撑点
@@ -9,7 +9,7 @@ class VPTInternalNode:
         self.left = left  # 左子树
         self.right = right  # 右子树
 
-#
+# VP 树批建算法
 def VPTBulkload(data, MaxLeafSize, distance_function):
     """
     VP 树批建算法
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         file_path=file_path
     )
 
-    # 构建 GHT 树
+    # 构建 VP 树
     vpt_root = VPTBulkload(data, max_leaf_size, minkowski_distance)
 
     # 打印部分数据
