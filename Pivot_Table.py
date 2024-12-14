@@ -71,7 +71,7 @@ def PTRangeSearch(pivot_table, distance_function, query_point, radius):
 if __name__ == "__main__":
     # 参数
     num_data_points = 10  # 数据点数量
-    num_pivots = 2         # 支撑点数量
+    num_pivots = 1         # 支撑点数量
     dimensions = 1         # 数据点维度
     query_point = [8]  # 查询点
     search_radius = 15     # 查询半径
@@ -94,8 +94,10 @@ if __name__ == "__main__":
         file_path=file_path
     )
 
-    # 生成或加载支撑点
+    # 随机选取支撑点
     pivots = pivotSelection(data, num_pivots)
+    # 手动移除支撑点 VP
+    data = [x for x in data if x not in pivots]
 
     # 构建 Pivot Table
     pivot_table = PivotTable(data, pivots, minkowski_distance)

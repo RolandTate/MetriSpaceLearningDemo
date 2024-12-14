@@ -39,7 +39,7 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
         # 随机选择支撑点
         pivot = pivotSelection(data, 1)
         # 手动移除支撑点 VP
-        data = [x for x in data if x != pivot]
+        data = [x for x in data if x not in pivot]
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择支撑点

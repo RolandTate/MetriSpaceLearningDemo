@@ -26,7 +26,7 @@ def GHTBulkload(data, MaxLeafSize, distance_function):
     if len(data) <= MaxLeafSize:
         pivot = pivotSelection(data, 1)
         # 手动移除支撑点 VP
-        data = [x for x in data if x != pivot]
+        data = [x for x in data if x not in pivot]
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择两个支撑点（这里简单随机选择）
