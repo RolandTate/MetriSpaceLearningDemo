@@ -1,4 +1,4 @@
-from tools import generate_data, minkowski_distance_factory, pivotSelection, determineSplitRadius, getAllData
+from tools import generate_data, minkowski_distance_factory, pivotSelectionRand, determineSplitRadius, getAllData
 from Pivot_Table import PivotTable, PTRangeSearch
 
 # VP 树内部节点类
@@ -22,13 +22,13 @@ def VPTBulkload(data, MaxLeafSize, distance_function):
         return None
     # 当数据量小于等于 MaxLeafSize 时，构建 Pivot Table 作为叶子节点
     if len(data) <= MaxLeafSize:
-        pivot = pivotSelection(data, 1)
+        pivot = pivotSelectionRand(data, 1)
         # 手动移除支撑点 VP
         data = [x for x in data if x not in pivot]
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择支撑点
-    VP = pivotSelection(data, 1)[0]
+    VP = pivotSelectionRand(data, 1)[0]
 
     # 手动移除支撑点 VP
     data = [x for x in data if x != VP]

@@ -64,7 +64,7 @@ def minkowski_distance_factory(t):
             return sum(abs(x - y) ** t for x, y in zip(p1, p2)) ** (1 / t)
     return minkowski_distance
 
-def pivotSelection(data, pivots_num):
+def pivotSelectionRand(data, pivots_num):
     return random.sample(data, pivots_num)
 
 def determineSplitRadius(data, pivot, distanc_function):

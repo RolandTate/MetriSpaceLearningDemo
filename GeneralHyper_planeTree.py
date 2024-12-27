@@ -1,6 +1,6 @@
 import random
 import math
-from tools import generate_data, minkowski_distance_factory, pivotSelection
+from tools import generate_data, minkowski_distance_factory, pivotSelectionRand
 from Pivot_Table import PivotTable, PTRangeSearch
 
 # GHT 树内部节点类
@@ -24,13 +24,13 @@ def GHTBulkload(data, MaxLeafSize, distance_function):
         return None
     # 当数据量小于等于 MaxLeafSize 时，构建 Pivot Table 作为叶子节点
     if len(data) <= MaxLeafSize:
-        pivot = pivotSelection(data, 1)
+        pivot = pivotSelectionRand(data, 1)
         # 手动移除支撑点 VP
         data = [x for x in data if x not in pivot]
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择两个支撑点（这里简单随机选择）
-    c1, c2 = pivotSelection(data, 2)
+    c1, c2 = pivotSelectionRand(data, 2)
 
     # 手动移除支撑点 c1 和 c2
     data = [x for x in data if x != c1 and x != c2]

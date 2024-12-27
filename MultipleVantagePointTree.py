@@ -1,5 +1,6 @@
-from tools import generate_data, minkowski_distance_factory, pivotSelection, determineSplitRadius, getAllData
+from tools import generate_data, minkowski_distance_factory, pivotSelectionRand, determineSplitRadius, getAllData
 from Pivot_Table import PivotTable, PTRangeSearch
+from PivotSelectionAlgorithm import maxVarianceSelection
 
 # 按支撑点划分数据集
 def split(data, vantage_point, num_regions, distance_function):
@@ -37,13 +38,13 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
     # 当数据量小于等于 MaxLeafSize 时，构建 Pivot Table 作为叶子节点
     if len(data) < k or len(data) <= MaxLeafSize:
         # 随机选择支撑点
-        pivot = pivotSelection(data, 1)
+        pivot = pivotSelectionRand(data, 1)
         # 手动移除支撑点 VP
         data = [x for x in data if x not in pivot]
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择支撑点
-    VP = pivotSelection(data, k)
+    VP = maxVarianceSelection(data, k, distance_function)
 
     # 移除支撑点
     data = [x for x in data if x not in VP]  # 移除支撑点

@@ -1,7 +1,7 @@
 import random
 import os
 import json
-from tools import generate_data, minkowski_distance_factory, pivotSelection
+from tools import generate_data, minkowski_distance_factory, pivotSelectionRand
 
 # 示例数据生成，值限制为整数
 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     )
 
     # 随机选取支撑点
-    pivots = pivotSelection(data, num_pivots)
+    pivots = pivotSelectionRand(data, num_pivots)
     # 手动移除支撑点 VP
     data = [x for x in data if x not in pivots]
 
