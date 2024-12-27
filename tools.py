@@ -4,7 +4,7 @@ import json
 
 
 # 数据生成函数
-def generate_data(num_points, dimensions, lower=0, upper=100, save_to_file=False, file_name="data.json",
+def generate_data(num_points, dimensions, lower=0, upper=10000, save_to_file=False, file_name="data.json",
                   file_path="./"):
     """
     生成随机整数数据，并可选存储到文件；如果文件已存在，则直接加载
