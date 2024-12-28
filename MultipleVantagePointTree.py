@@ -1,6 +1,6 @@
 from tools import generate_data, minkowski_distance_factory, pivotSelectionRand, determineSplitRadius, getAllData
 from Pivot_Table import PivotTable, PTRangeSearch
-from PivotSelectionAlgorithm import maxVarianceSelection, maxSeparatedSelection, farthestFirstTraversalSelection, maxMeanSelection
+from PivotSelectionAlgorithm import maxVarianceSelection, maxSeparatedSelection, farthestFirstTraversalSelection, maxMeanSelection, incrementalSamplingPivotSelection
 
 # 按支撑点划分数据集
 def split(data, vantage_point, num_regions, distance_function):
@@ -44,7 +44,7 @@ def MVPTBulkload(data, MaxLeafSize, k, num_regions, distance_function):
         return PivotTable(data, pivot, distance_function)  # 构建 PivotTable
 
     # 选择支撑点
-    VP = maxSeparatedSelection(data, k, distance_function)
+    VP = incrementalSamplingPivotSelection(data, k, distance_function)
 
     # 移除支撑点
     data = [x for x in data if x not in VP]  # 移除支撑点

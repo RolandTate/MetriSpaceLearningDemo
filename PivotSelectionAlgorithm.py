@@ -140,3 +140,83 @@ def maxMeanSelection(data, pivots_num, distance_function):
         pivots.append(best_pivot)
 
     return pivots
+
+
+def radius_sensitive_evaluation(evaluation_set, distance_function, pivot_set, r):
+    """
+    半径敏感的目标函数，计算在支撑点空间中，满足切比雪夫距离大于等于 r 的点对数量。
+
+    :param evaluation_set: 用于评价的点集合
+    :param distance_function: 距离函数
+    :param pivot_set: 当前的支撑点集合
+    :param r: 半径阈值
+    :return: 满足条件的点对数量
+    """
+    Chebyshev_distance = minkowski_distance_factory(float('inf'))
+
+    # 投影到支撑点空间
+    projected_points = [
+        [distance_function(x, pivot) for pivot in pivot_set] for x in evaluation_set
+    ]
+
+    # 计算满足切比雪夫距离大于等于 r 的点对数量
+    count = 0
+    for i, x_projection in enumerate(projected_points):
+        for j, y_projection in enumerate(projected_points):
+            if i != j:  # 避免点对自身的计算
+                chebyshev_distance = Chebyshev_distance(x_projection, y_projection)
+                if chebyshev_distance >= r:
+                    count += 1
+    return count
+
+
+def incrementalSamplingPivotSelection(data, num_pivots, distance_function):
+    """
+    增量采样支撑点选择算法。
+
+    :param data: 数据点集合
+    :param distance_function: 距离函数
+    :param num_pivots: 需要选择的支撑点个数
+    :param candidate_function: 生成候选集合的函数
+    :param evaluation_function: 评价函数，用于评估候选点在给定支撑点集合中的表现
+    :return: 支撑点集合
+    """
+    # 初始化候选集合
+    # candidate_set = candidate_function(data)
+    # candidate_set = pivotSelectionRand(data, 5)
+    candidate_set = farthestFirstTraversalSelection(data, 10, distance_function)
+
+    # 初始化评估集合
+    # evaluation_set = candidate_function(data)
+    evaluation_set = pivotSelectionRand(data, 100)
+
+    # 初始化支撑点集合
+    pivots = []
+
+    # 迭代选择支撑点
+    for _ in range(num_pivots):
+        best_value = 0  # 初始化最佳值为0
+        best_point = None  # 初始化最佳点
+
+        # 遍历候选集合，评估每个候选点
+        for candidate in candidate_set:
+            # 如果候选点已被选中过，则跳过
+            if candidate in pivots:
+                continue
+
+            # 假设当前候选点加入支撑点集合
+            current_pivot_set = pivots + [candidate]
+
+            # 计算候选点的评价值
+            # value = evaluation_function(evaluation_set, distance_function, current_pivot_set)
+            value = radius_sensitive_evaluation(evaluation_set, distance_function, current_pivot_set, 200)
+
+            # 更新最佳点
+            if value > best_value:
+                best_value = value
+                best_point = candidate
+
+        # 将最佳点加入支撑点集合
+        pivots.append(best_point)
+
+    return pivots
