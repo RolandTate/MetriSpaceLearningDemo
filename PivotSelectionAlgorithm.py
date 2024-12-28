@@ -1,5 +1,6 @@
 from tools import pivotSelectionRand, minkowski_distance_factory
 import numpy as np
+from tqdm import tqdm
 
 def maxVarianceSelection(data, pivots_num, distance_function):
     """
@@ -18,7 +19,7 @@ def maxVarianceSelection(data, pivots_num, distance_function):
     for _ in range(1, pivots_num):
         # 存储每个数据点到当前支撑点集合的距离
         distances = []
-        for x in data:
+        for x in [point for point in data if point not in pivots]:
             # 对每个点计算到当前所有支撑点的距离
             dist_to_pivots = [distance_function(x, pivot) for pivot in pivots]
             distances.append(dist_to_pivots)
@@ -52,7 +53,7 @@ def maxSeparatedSelection(data, pivots_num, distance_function):
     for _ in range(1, pivots_num):
         # 计算每个点与当前所有支撑点的距离和
         distance_sums = []
-        for x in data:
+        for x in [point for point in data if point not in pivots]:
             # 对每个点计算到当前所有支撑点的距离之和
             dist_to_pivots_sum = sum(distance_function(x, pivot) for pivot in pivots)
             distance_sums.append(dist_to_pivots_sum)
@@ -80,7 +81,7 @@ def farthestFirstTraversalSelection(data, pivots_num, distance_function):
     for _ in range(1, pivots_num):
         # 存储每个数据点到当前所有支撑点的最小距离
         min_distances = []
-        for x in data:
+        for x in [point for point in data if point not in pivots]:
             # 对每个点计算到所有支撑点的最小距离
             min_distance = min(distance_function(x, pivot) for pivot in pivots)
             min_distances.append(min_distance)
@@ -109,15 +110,33 @@ def maxMeanSelection(data, pivots_num, distance_function):
 
     # 迭代选择剩余的支撑点
     for _ in range(1, pivots_num):
-        # 存储每个候选点到当前支撑点的所有距离的切比雪夫距离总和
-        distance_sums = []
-        for x in data:
-            # 对于每个点，计算其到所有已选支撑点的最大距离，因为个数一定，所以没有必要求平均
-            dist_to_pivots_sum = sum(Chebyshev_distance(x, pivot) for pivot in pivots)
-            distance_sums = [].append(dist_to_pivots_sum)
+        max_sum = 0
+        best_pivot = None
 
-        # 选择使得切比雪夫距离总和最大的点作为下一个支撑点
-        max_mean_dist_idx = np.argmax(distance_sums)
-        pivots.append(data[max_mean_dist_idx])
+        # 遍历剩余的每个点，假设其为新增的支撑点
+        for candidate in tqdm(data):
+            if candidate in pivots:
+                continue
+
+            # 假设 candidate 为新的支撑点，计算所有点在支撑点空间的投影
+            candidate_pivots = pivots + [candidate]
+            data_in_pivot_space = [
+                [distance_function(x, pivot) for pivot in candidate_pivots] for x in data
+            ]
+
+            # 计算切比雪夫距离的总和
+            total_chebyshev_sum = sum(
+                Chebyshev_distance(x_projection, y_projection)
+                for x_projection in data_in_pivot_space
+                for y_projection in data_in_pivot_space
+            )
+
+            # 更新最大值
+            if total_chebyshev_sum > max_sum:
+                max_sum = total_chebyshev_sum
+                best_pivot = candidate
+
+        # 将最优的支撑点加入结果
+        pivots.append(best_pivot)
 
     return pivots
